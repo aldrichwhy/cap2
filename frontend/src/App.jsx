@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import EmotionDetectionPage from "./pages/EmotionDetectionPage";
 import TherapistHomePage from "./pages/TherapistHomePage";
 import PatientHomePage from "./pages/PatientHomePage";
+import PatientChatBoard from "./pages/PatientChatBoard";
 
 //These handles the URLs and where they lead to
 
@@ -18,6 +19,7 @@ function App() {
     <Route path="/therapist-home" element={<TherapistHomePage />} />
     <Route path="/therapist" element={<EmotionDetectionPage />} />
     <Route path="/patient-home" element={<PatientHomePage />} />
+    <Route path="/patient-chat" element={<PatientChatBoard />} />
 </Routes>
   );
 }

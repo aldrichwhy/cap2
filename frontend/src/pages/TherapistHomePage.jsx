@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Calendar as CalendarIcon, 
   Users, 
@@ -24,47 +24,7 @@ import { cn } from '../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import eztherapylogo from '../assets/eztherapy transparent.png';
 
-// Mock Data
-const INITIAL_APPOINTMENTS = [
-  {
-    id: '1',
-    patientId: 'p1',
-    patientName: 'Alex Johnson',
-    therapistId: 't1',
-    therapistName: 'Dr. Sarah Chen',
-    date: new Date().toISOString().split('T')[0],
-    startTime: '10:00',
-    endTime: '11:00',
-    status: 'confirmed',
-    type: 'video',
-    videoLink: 'https://meet.google.com/abc-defg-hij'
-  },
-  {
-    id: '2',
-    patientId: 'p2',
-    patientName: 'Mia Jones',
-    therapistId: 't1',
-    therapistName: 'Dr. Sarah Chen',
-    date: new Date().toISOString().split('T')[0],
-    startTime: '13:00',
-    endTime: '14:00',
-    status: 'confirmed',
-    type: 'in-person'
-  },
-  {
-    id: '3',
-    patientId: 'p3',
-    patientName: 'Noah Williams',
-    therapistId: 't1',
-    therapistName: 'Dr. Sarah Chen',
-    date: addDays(new Date(), 1).toISOString().split('T')[0],
-    startTime: '09:00',
-    endTime: '10:00',
-    status: 'confirmed',
-    type: 'video',
-    videoLink: 'https://meet.google.com/noah-session'
-  }
-];
+// Removed INITIAL_APPOINTMENTS
 
 const MOCK_PATIENTS = [
   { id: 'p1', name: 'Alex Johnson', age: 8, status: 'Stable & Calm', lastActive: '2h ago', avatar: 'https://picsum.photos/seed/p1/200' },
@@ -77,11 +37,28 @@ export default function TherapistHomePage() {
   const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [appointments, setAppointments] = useState(INITIAL_APPOINTMENTS);
+  const [appointments, setAppointments] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [bookingTime, setBookingTime] = useState('10:00');
   const [selectedPatient, setSelectedPatient] = useState(MOCK_PATIENTS[0]);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const username = localStorage.getItem('username') || '';
+        const role = localStorage.getItem('role') || 'therapist';
+        const response = await fetch(`http://localhost:8000/api/appointments/${username}?role=${role}`);
+        if (response.ok) {
+          const data = await response.json();
+          setAppointments(data);
+        }
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+      }
+    };
+    fetchAppointments();
+  }, []);
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -161,7 +138,14 @@ export default function TherapistHomePage() {
         </div>
 
         <div className="mt-auto p-6 border-t border-slate-100">
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all">
+          <button 
+            onClick={() => {
+              localStorage.removeItem('username');
+              localStorage.removeItem('role');
+              navigate('/login');
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all"
+          >
             <LogOut size={20} />
             Logout
           </button>

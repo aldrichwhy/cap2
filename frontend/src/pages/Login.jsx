@@ -14,7 +14,7 @@ function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://localhost:8000/login", {
+      const response = await fetch("/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -23,6 +23,9 @@ function Login() {
       if (response.ok) {
         const data = await response.json();
         setError("");
+        localStorage.setItem("username", data.username);
+        localStorage.setItem("role", data.role);
+        
         if (data.role === "therapist") {
           navigate("/therapist-home");
         } else {
